@@ -1,0 +1,67 @@
+### Question 1
+## How does it generate a map-reduce query for a simple SELECT COUNT(*) FROM customer?
+
+What is Hadoop?
+Hadoop helps in parallel computing, first it retrieves the data and divides into clusters, then it works with the data locally as it has been already retrieved. 
+It creates a Hadoop Distributed File System (HDFS)
+
+What is MapReduce?
+MapReduce is a programming paradigm that helps on the processing of data. The advantage is that it takes a file which is divided into chunks with the help of Hadoop. 
+Then it processes this divided data in parallel. MapReduce maps all the data into key: value pairs (mappers), then the reducer takes this output and combines 
+all the data with the same key and process them as needed. I watch [this video](https://www.youtube.com/watch?v=KzMXU9A3v4I) to understand MapReduce.
+
+I will answer de question based on what I’ve read and what I practiced using an online editor for Hive which you can access it through this [link](https://demo.gethue.com/hue/editor?editor=58536). 
+In Hive for a simple `SELECT * FROM table` won’t use a MapReduce (MR), this is because it is programmed to function in the most efficient possible way, 
+so for this mentioned query it would be slower to use a MR. In contrast whenever an aggregate function is requested a MR comes in helpful and it makes it faster. 
+
+Hive has an [`EXPLAIN`](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Explain) command which lets you see the “behind the scenes” process of a query, so if you use it will show you the MapReduce jobs. In Hive if a simple 
+`SELECT COUNT(*) FROM table`  it won’t use a MR I confirmed this using the online editor and the EXPLAIN command, although I use a small table, but this true for newer 
+versions of Hive. It doesn’t uses a MR because Hive doesn’t need it for simple queries such as this one, it is faster to make a direct fetch operation from HDFS than doing a MR, 
+because a simple COUNT(*) doesn’t have a WHERE or GROUP BY, so no filtering or summarizing is done.
+
+In contrast if you add a condition, for example `SELECT COUNT(*) FROM buyer GROUP BY buyer.id` (in this case the id repeats), it will kick in a MR job, 
+once again I confirmed this with the EXPLAIN command. Now what happens in this scenario, is that you are asking for the count of buyers by the id, first the map job will 
+group the data into key: value pairs, where the key would be the buyer.id, and the value would be one (because it is counting), then the reduce job will take all these pairs and 
+combine the ones that have the same key, for example, you have a buyer with an id of 3, which appeared 
+2 times in the table it would look like this in the map job {1:1},{2:1},{3:1}, {3:1}, where you have buyers with id 1 and 2, 
+then the reduce job will know it has two equal keys and then sum the values which would end up with {1:1},{2:1},{3:2}.
+
+### Question 2
+## How does Async and Defer attributes work with JavaScript?
+JavaScript runs normally in a synchronous way or single threaded, this means that it runs one command at a time in the order the code appears. 
+This can be time consuming when things have to render, JS files tend to be heavier and takes longer to process, so whenever it appears in a HTML file it 
+will halt the entire code until the JS file finishes.
+
+For example, whenever you encounter a HTML file like this one:
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My test page</title>
+    <script src="scripts/main.js"></script>
+  </head>
+  <body>
+    ...
+  </body>
+</html>
+```
+It will run tag by tag until it is blocked by the `<script>` tag, then it will enter the JS file and it will download it and then execute it, after this it will finish with the 
+remaining html tags, this can be very slow if it has to process a big JS file. One solution was to put the tag at the bottom of the file but is not a real solution
+so this is when these two attributes come in. Async and defer help to download the JS file in an 
+asynchronus way, which means it will run the html tags and at the same time it downloads the JS file, although it won't execute it asynchronously.
+
+An `async` attribute would look like this in the tag `<script async src="scripts/main.js"></script>`. In this case it will tell the browser to download the JS file at the same 
+time it keeps building the page, but whenever it finish to download, it will stop everything and execute the JS file, then it will continue where the html file left off.
+
+A `defer` attribute would just replace the async word in the tag and it will work similarly to the async attribute. With defer it will work the same as async up until 
+it finishes downloading the JS file, then instead of executing it right away, the DOM will continue to build until it is ready running the html file and then 
+it will execute the JS file. So in this case it runs continously the html file and the end executes the JS file, although it is already downloaded. 
+This attribute doesn't stops the rendering process, so it is preferred whenever you prioritize the redering over the JS file. 
+
+Whenever there are multiple JS files, the async attribute can execute them randomly without a defined order, in contrast defer, at the end of the rendering it will execute
+each JS file in the order the script tags appeared.
+
+Now what happens inside JavaScript whenever it encounters this two attributes.
+
+### Question 3
+## How do createContext and useContext hooks work in React?
