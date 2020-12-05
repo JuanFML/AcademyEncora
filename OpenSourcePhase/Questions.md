@@ -60,6 +60,8 @@ it will execute the JS file, but before the DOMContentLoaded event.
 So in this case it runs continuously the html file and the end executes the JS file, although it is already downloaded. 
 This attribute doesn't stop the rendering process, so it is preferred whenever you prioritize the rendering over the JS file. 
 
+In both cases what happens in the browser, whenever one of these attributes are present, is that they make a promise not use anything or injetc something to the browser parser using commands like `document.write`. In the case of `defer` it tells the browser to not execute the `DOMContentLoaded` until all the scripts are parsed, but with `async` it executes whenever it is done downloading.
+
 Whenever there are multiple JS files, the async attribute can execute them randomly without a defined order whatever downloads first, in contrast defer, at the end of the rendering it will execute each JS file in the order the script tags appeared.
 
 Now what happens inside JavaScript whenever it encounters these two attributes.
